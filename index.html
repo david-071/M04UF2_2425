@@ -21,8 +21,7 @@ let config = {
 let game = new Phaser.Game(config);
 
 let rect;
-
-let rect_dir = 1;
+let cursors;
 
 function precarga ()
 {
@@ -32,15 +31,29 @@ function precarga ()
 function crea ()
 {
 	rect = this.add.rectangle(400, 225, 32, 32, 0xffffff);
+	
+	cursors = this.input.keyboard.createCursorKeys();
 }
 
 function actualiza ()
 {
-	rect.x += rect_dir;
-
-	if (rect.x <= 0 || rect.x >= canvas_w){
-		rect_dir = -rect_dir;
+	let speed = 5;
+	
+	if (cursors.left.isDown) {
+		rect.x -= speed;
 	}
+	if (cursors.right.isDown) {
+		rect.x += speed;
+	}
+	if (cursors.up.isDown) {
+		rect.y -= speed;
+	}
+	if (cursors.down.isDown) {
+		rect.y += speed;
+	}
+
+	rect.x = Phaser.Math.Clamp(rect.x, 0, canvas_w);
+	rect.y = Phaser.Math.Clamp(rect.y, 0, canvas_h);
 }
 		</script>
 	</head>
