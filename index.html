@@ -5,6 +5,7 @@
 		<title>Hueveras de cartón 2</title>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.87.0/phaser.min.js"></script>
 		<script>
+
 let canvas_w = 800;
 let canvas_h = 450;
 
@@ -20,41 +21,112 @@ let config = {
 
 let game = new Phaser.Game(config);
 
-let rect;
-let cursors;
+//let rect;
+//let rect_dir = 1;
+
+let canvas_bg, eggcups_bg;
+
+let huevera_b, huevera_m, huevera_d;
+let huevera_x = 128;
+
+let huevo_b, huevo_m, huevo_d;
+
+let huevo_shadow;
+
+let sprite_scale = .6;
 
 function precarga ()
 {
-
+	this.load.image('grass_bg', 'imgs/grass_bg.png');
+	this.load.image('straw_bg', 'imgs/straw_bg.png');
+	this.load.image('huevera', 'imgs/huevera.png');
+	this.load.image('huevo', 'imgs/huevo.png');
 }
 
 function crea ()
 {
-	rect = this.add.rectangle(400, 225, 32, 32, 0xffffff);
-	
-	cursors = this.input.keyboard.createCursorKeys();
+	let dorado = Phaser.Display.Color.GetColor(255, 215, 0);
+	let marron = Phaser.Display.Color.GetColor(192, 128, 16);
+
+
+	canvas_bg = this.add.image(canvas_w/2, canvas_h/2, 'grass_bg');
+
+	eggcups_bg = this.add.image(huevera_x, canvas_h/2, 'straw_bg');
+	eggcups_bg.setScale(.5);
+	eggcups_bg.angle = 90;
+
+
+	huevera_d = this.add.image(huevera_x, canvas_h/2 - 128, 'huevera');
+	huevera_d.setScale(sprite_scale);
+	huevera_d.setTint(dorado);
+
+	huevera_m = this.add.image(huevera_x, canvas_h/2, 'huevera');
+	huevera_m.setScale(sprite_scale);
+	huevera_m.setTint(marron);
+
+	huevera_b = this.add.image(huevera_x, canvas_h/2 + 128 , 'huevera');
+	huevera_b.setScale(sprite_scale);
+
+	huevo_shadow = this.add.image(-10000, -1000, 'huevo');
+	huevo_shadow.setTint("#000000");
+	huevo_shadow.alpha = .5;
+	huevo_shadow.setScale(1.3);
+
+
+	huevo_m = this.add.image(400, 256, 'huevo');
+	huevo_m.setTint(marron);
+
+	huevo_m.setInteractive({ draggable:true });
+
+	huevo_m.on('pointerdown', function (){
+		console.log("Huevo marrón");
+
+		huevo_shadow.x = this.x + 8;
+		huevo_shadow.y = this.y + 8;
+
+
+		this.setScale(1.3);
+	});
+
+	this.input.on('drag', function (pointer, object, x, y) {
+		object.x = x;
+		object.y = y;
+		huevo_shadow.x = x + 8;
+		huevo_shadow.y = y + 8;
+
+		if (Phaser.Geom.Intersects.RectangleToRectangle(huevera_m.getBounds(), object.getBounds())){
+			console.log("Huevo dentro de huevera!!!");
+		}
+	});
+
+	this.input.on('dragend', function (pointer, object, x, y) {
+		object.setScale(1);
+		huevo_shadow.x = -10000;
+		huevo_shadow.y = -10000;
+	});
 }
+
 
 function actualiza ()
 {
-	let speed = 5;
-	
-	if (cursors.left.isDown) {
-		rect.x -= speed;
-	}
-	if (cursors.right.isDown) {
-		rect.x += speed;
-	}
-	if (cursors.up.isDown) {
-		rect.y -= speed;
-	}
-	if (cursors.down.isDown) {
-		rect.y += speed;
-	}
 
-	rect.x = Phaser.Math.Clamp(rect.x, 0, canvas_w);
-	rect.y = Phaser.Math.Clamp(rect.y, 0, canvas_h);
 }
+
+
+function actualiza_rect ()
+{
+	
+	rect.x += rect_dir;
+
+	if (rect.x <= 0 || rect.x >= canvas_w){
+		rect_dir = -rect_dir;
+	}
+		
+
+}
+
+
+
 		</script>
 	</head>
 	<body>
