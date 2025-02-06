@@ -18,13 +18,15 @@ let canvas_bg, eggcups_bg;
 let huevera_b, huevera_m, huevera_d;
 let huevera_x = 128;
 
+let dorado = Phaser.Display.Color.GetColor(255, 215, 0);
+let marron = Phaser.Display.Color.GetColor(192, 128, 16);
+
 let huevo_b, huevo_m, huevo_d;
 
 let huevo_shadow;
 
-let huevos;
-let huevos_dir = 2;
-let huevos_y = 0;
+let huevo = null;
+let huevo_dir = 2;
 
 let sprite_scale = .6;
 
@@ -42,10 +44,6 @@ function precarga ()
 
 function crea ()
 {
-	let dorado = Phaser.Display.Color.GetColor(255, 215, 0);
-	let marron = Phaser.Display.Color.GetColor(192, 128, 16);
-
-
 	canvas_bg = this.add.image(canvas_w/2, canvas_h/2, 'grass_bg');
 
 	eggcups_bg = this.add.image(huevera_x, canvas_h/2, 'straw_bg');
@@ -122,46 +120,34 @@ function crea ()
 	});
 
 	countdown_text = this.add.text(canvas_w/2 + canvas_w/8, 16, countdown, {"fontSize": 48, "fontStyle": "bold"} );
-	
-	huevos = null;
 }
 
 function actualiza ()
 {
-	if (huevos === null) {
-	
+	if (huevo == null) {
 		let tipoHuevo = Phaser.Math.Between(1, 3);
-		let color = null;
 
-		if (tipoHuevo === 2) color = Phaser.Display.Color.GetColor(192, 128, 16); 
-		if (tipoHuevo === 3) color = Phaser.Display.Color.GetColor(255, 215, 0); 
-
-		huevos = this.add.image(Phaser.Math.Between(200, 600), huevos_y, 'huevo');
-		if (color) {
-			huevos.setTint(color);
+		if (tipoHuevo == 1) {
+			huevo = huevo_b;
 		}
+		else if (tipoHuevo == 2) {
+			huevo = huevo_m;
+		}
+		else {
+			huevo = huevo_d;
+		}
+
+		huevo.x = Phaser.Math.Between(200, 700);
+		huevo.y = 0;
 	} 
 	else {
-		huevos.y += huevos_dir;
+		huevo.y += huevo_dir;
 
-		if (huevos.y >= canvas_h) {
-			huevos.destroy();
-			huevos = null; 
+		if (huevo.y >= canvas_h) {
+			huevo.y = -50;
+			huevo = null; 
 		}
 	}
-}
-
-
-function actualiza_rect ()
-{
-	
-	rect.x += rect_dir;
-
-	if (rect.x <= 0 || rect.x >= canvas_w){
-		rect_dir = -rect_dir;
-	}
-		
-
 }
 
 countdown_interval = setInterval (function(){
