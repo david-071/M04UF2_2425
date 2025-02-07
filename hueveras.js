@@ -34,12 +34,27 @@ let countdown = 60;
 let countdown_text;
 let countdown_interval;
 
+let music = {
+	background: null,
+	game_over: null
+};
+
+let fx = {
+	mouseclick: null,
+	bad: null,
+	good: null
+};
+
 function precarga ()
 {
 	this.load.image('grass_bg', 'imgs/grass_bg.png');
 	this.load.image('straw_bg', 'imgs/straw_bg.png');
 	this.load.image('huevera', 'imgs/huevera.png');
 	this.load.image('huevo', 'imgs/huevo.png');
+
+	this.load.audio('background_music', 'audio/background_music.ogg');
+	this.load.audio('game_over_music', 'audio/game_over_music.ogg');
+	this.load.audio('mouseclick_fx', 'audio/mouse_sound.wav');
 }
 
 function crea ()
@@ -82,6 +97,7 @@ function crea ()
 		huevo_shadow.x = this.x + 8;
 		huevo_shadow.y = this.y + 8;
 		this.setScale(1.3);
+		fx.mouseclick.play();
 	});
 	
 	huevo_d.setInteractive({ draggable:true });
@@ -91,6 +107,7 @@ function crea ()
 		huevo_shadow.x = this.x + 8;
 		huevo_shadow.y = this.y + 8;
 		this.setScale(1.3);
+		fx.mouseclick.play();
 	});
 	
 	huevo_b.setInteractive({ draggable:true });
@@ -100,6 +117,7 @@ function crea ()
 		huevo_shadow.x = this.x + 8;
 		huevo_shadow.y = this.y + 8;
 		this.setScale(1.3);
+		fx.mouseclick.play();
 	});
 
 	this.input.on('drag', function (pointer, object, x, y) {
@@ -120,10 +138,30 @@ function crea ()
 	});
 
 	countdown_text = this.add.text(canvas_w/2 + canvas_w/8, 16, countdown, {"fontSize": 48, "fontStyle": "bold"} );
+
+	music.background = this.sound.add ('background_music', {
+			loop: true,
+			volume: 0.5
+		});
+
+	music.background.play();
+
+	music.game_over = this.sound.add ('game_over_music', {
+			loop: false,
+			volume: 0.5
+		});
 }
 
 function actualiza ()
 {
+	if (countdown == 10){
+		music.background.rate = 1.25;
+	}
+	else if (countdown <= 0){
+		music.background.stop();
+		music.game_over.play();
+	}
+
 	if (huevo == null) {
 		let tipoHuevo = Phaser.Math.Between(1, 3);
 
@@ -157,6 +195,9 @@ countdown_interval = setInterval (function(){
 
 	if (countdown <= 0){
 		console.log("Game Over");
+		music.background.stop();
+		music.game_over.play();
+
 		clearInterval(countdown_interval);
 	}
 }, 1000);
